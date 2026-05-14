@@ -13,7 +13,7 @@
       class="max-w-md w-full bg-white/10 backdrop-blur-2xl rounded-[2.5rem] shadow-2xl p-10 relative z-10 border border-white/20">
 
       <div class="text-center mb-10 flex flex-col items-center">
-        <img src="/assets/images/kelola-logo.png" alt="Kelola Logo" class="h-16 w-auto mb-4 drop-shadow-lg" />
+        <img src="/assets/images/logo-finjoy.png" alt="Kelola Logo" class="h-16 w-auto mb-4 drop-shadow-lg" />
         <p class="text-kelola-lime font-semibold tracking-wide text-sm uppercase">
           {{ step === 1 ? 'Lupa Kata Sandi' : 'Atur Ulang Kata Sandi' }}
         </p>
@@ -57,7 +57,8 @@
         </div>
 
         <div>
-          <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-2">Kata Sandi Baru</label>
+          <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-2">Kata Sandi
+            Baru</label>
           <input v-model="form.newPassword" type="password" required placeholder="••••••••"
             class="w-full bg-white border-2 border-gray-100 rounded-2xl py-4 px-5 text-kelola-teal font-extrabold focus:outline-none focus:border-kelola-sea focus:ring-4 focus:ring-kelola-sea/20 transition-all shadow-inner placeholder:font-bold placeholder:text-gray-400" />
         </div>
@@ -66,7 +67,7 @@
           class="w-full mt-6 bg-gradient-to-r from-kelola-lime to-kelola-pale text-kelola-teal py-4 rounded-2xl font-black text-lg uppercase tracking-widest shadow-[0_10px_30px_rgba(214,251,0,0.3)] hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 border-white/20 border-b-4">
           {{ loading ? 'MEMPROSES...' : 'GANTI KATA SANDI' }}
         </button>
-        
+
         <button type="button" @click="step = 1"
           class="w-full text-center text-[10px] font-bold text-kelola-lime hover:underline uppercase tracking-wider">
           Kembali ke input email
