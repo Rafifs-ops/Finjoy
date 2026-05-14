@@ -1,0 +1,104 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:../server/db/kelola.db" // Gunakan prefix 'file:' untuk SQLite
+}
+
+model budget {
+  id           String   @id @default(uuid())
+  userId       String
+  category     String
+  monthlyLimit Float
+  monthYear    String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         user     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, category, monthYear])
+}
+
+model debt {
+  id               String        @id @default(uuid())
+  userId           String
+  title            String
+  total_amount     Float
+  remaining_amount Float
+  dueDate          DateTime?
+  status           String        @default("UNPAID")
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  transactions     transaction[]
+  user             user          @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model portfolio {
+  id        String   @id @default(uuid())
+  userId    String
+  type      String
+  symbol    String
+  amount    Float
+  buyPrice  Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      user     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model transaction {
+  id              String         @id @default(uuid())
+  userId          String
+  category        String?
+  debtId          String?
+  savingId        String?
+  type            String
+  amount          Float
+  date            DateTime
+  description     String?
+  priority        String?
+  receiptUrl      String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  debt            debt?          @relation(fields: [debtId], references: [id])
+  saving          saving?        @relation(fields: [savingId], references: [id], onDelete: SetNull)
+  user            user           @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model user {
+  id                            String        @id @default(uuid())
+  email                         String        @unique
+  name                          String?
+  image                         String?
+  is_premium                    Boolean       @default(false)
+  premium_expiry                DateTime?
+  aiChatCount                   Int           @default(0)
+  aiInsightCount                Int           @default(0)
+  createdAt                     DateTime      @default(now())
+  updatedAt                     DateTime      @updatedAt
+  password                      String?
+  email_verified_at             DateTime?
+  otp_code                      String?
+  otp_expires_at                DateTime?
+  reset_password_otp            String?
+  reset_password_otp_expires_at DateTime?
+  budget                        budget[]
+  transactions                  transaction[]
+  debts                         debt[]
+  portfolios                    portfolio[]
+  savings                       saving[]
+}
+
+model saving {
+  id           String        @id @default(uuid())
+  userId       String
+  name         String
+  targetAmount Float
+  isCompleted  Boolean       @default(false)
+  completedAt  DateTime?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  user         user          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions transaction[]
+}

@@ -1,0 +1,36 @@
+{
+  "name": "kelola",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "postinstall": "prisma generate",
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@nuxtjs/sitemap": "^7.6.0",
+    "@prisma/client": "^5.11.0",
+    "@tailwindcss/vite": "^4.2.4",
+    "bcryptjs": "^3.0.3",
+    "chart.js": "^4.5.1",
+    "jsonwebtoken": "^9.0.3",
+    "nodemailer": "^8.0.5",
+    "nuxt": "^4.4.2",
+    "nuxt-security": "^2.5.1",
+    "pdfmake": "^0.2.10",
+    "vue": "^3.4.21",
+    "vue-chartjs": "^5.3.3",
+    "vue-router": "^4.3.0"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/nodemailer": "^8.0.0",
+    "prisma": "^5.11.0",
+    "tailwindcss": "^4.2.4",
+    "typescript": "^5.4.3"
+  }
+}
