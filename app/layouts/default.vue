@@ -3,7 +3,7 @@
     <!-- Sidebar for Desktop -->
     <aside
       class="hidden md:flex flex-col w-64 bg-kelola-teal/90 backdrop-blur-xl text-white p-6 shadow-2xl z-20 border-r border-white/10">
-      <div class="mb-10 flex items-center">
+      <div class="mb-10 flex items-center mx-auto">
         <img src="/assets/images/logo-finjoy.png" alt="Finjoy Logo" class="h-20 w-auto" />
       </div>
       <nav class="flex-1 space-y-2">

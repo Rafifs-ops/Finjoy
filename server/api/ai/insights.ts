@@ -46,7 +46,7 @@ export default defineEventHandler(async (event) => {
   const prompt = `You are a financial advisor for Gen Z. Based on the following recent transactions, give a 2-sentence highly personalized, engaging daily insight or tip in Indonesian. Example: "Kamu sudah menghabiskan banyak anggaran makan minggu ini, kurangi jajan ya!". Transactions:\n${txData || 'Belum ada transaksi.'}`
 
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' }) // Mengambil data model gemini
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' }) // Mengambil data model gemini
     const result = await model.generateContent(prompt) // Mengambil repsonse dari model gemini
 
     // Jika user bukan premium, tambahkan 1 ke aiInsightCount

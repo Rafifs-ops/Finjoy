@@ -21,7 +21,7 @@
     </div>
 
     <!-- Stats -->
-    <div v-if="portfolios.length !== 0" class="grid grid-rows-2 md:grid-cols-2 gap-4 mb-8 md:mb-0">
+    <div v-if="portfolios?.length !== 0" class="grid grid-rows-2 md:grid-cols-2 gap-4 mb-8 md:mb-0">
       <div
         class="bg-white/80 backdrop-blur-md p-6 rounded-3xl shadow-sm border border-white/20 flex flex-col justify-center">
         <span class="text-xs font-black text-gray-700 uppercase tracking-widest mb-1">Total Kripto</span>
