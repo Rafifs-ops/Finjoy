@@ -210,7 +210,7 @@ const showNotify = ref(false)
 const notifyMsg = ref('')
 
 const openModal = (type) => {
-  form.value = { type, symbol: '', name: 'Asset', quantity: null, buy_price: 0 }
+  form.value = { type, symbol: '', name: 'Asset', quantity: null, buy_price: null }
   showAddModal.value = true
 }
 
@@ -219,13 +219,34 @@ const addAsset = async () => {
   try {
     form.value.symbol = form.value.symbol.toLowerCase()
     form.value.name = form.value.symbol.toUpperCase()
+
+    // Ambil harga live dari API untuk menghitung total pembelian
+    let livePricePerUnit = 0
+    if (form.value.type === 'CRYPTO') {
+      const res = await $csrfFetch(`/api/crypto?ids=${form.value.symbol}`)
+      livePricePerUnit = res?.[form.value.symbol]?.idr || 0
+    } else if (form.value.type === 'STOCK') {
+      const res = await $csrfFetch(`/api/saham?symbols=${form.value.name}`)
+      const stockData = res?.data?.results?.find(s => (s.symbol || '').toUpperCase() === form.value.name)
+      if (stockData && stockData.close) {
+        livePricePerUnit = typeof stockData.close === 'number' ? stockData.close : parseInt(stockData.close.toString().replace(/[^0-9]/g, ''))
+      }
+    }
+
+    // Hitung total pengeluaran (Saham: 1 Lot = 100 lembar)
+    if (form.value.type === 'STOCK') {
+      form.value.buy_price = form.value.quantity * 100 * livePricePerUnit
+    } else {
+      form.value.buy_price = form.value.quantity * livePricePerUnit
+    }
+
     await $csrfFetch('/api/portfolios', { method: 'POST', body: form.value, headers: useRequestHeaders(['cookie']) })
     showAddModal.value = false
     notifyMsg.value = 'Aset berhasil ditambahkan'
     showNotify.value = true
     await refreshPortfolios()
   } catch (e) {
-    notifyMsg.value = e.data.message || 'Gagal menambah aset'
+    notifyMsg.value = e.data?.message || 'Gagal menambah aset'
     showNotify.value = true
   } finally {
     formLoading.value = false

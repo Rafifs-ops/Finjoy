@@ -209,22 +209,41 @@ const hasExpenses = computed(() => {
   return dashboard.value?.recentTransactions?.some(t => t.type === 'EXPENSE') || false
 })
 
-const { data: cryptoPrices } = useCsrfFetch('/api/crypto')
-const { data: sahamPrices } = useCsrfFetch('/api/saham')
+const cryptoQuery = computed(() => {
+  const owned = dashboard.value?.portfolios?.filter(p => p.type === 'CRYPTO').map(p => p.symbol.toLowerCase()) || []
+  return Array.from(new Set(['bitcoin', 'ethereum', ...owned])).join(',')
+})
+const stockQuery = computed(() => {
+  const owned = dashboard.value?.portfolios?.filter(p => p.type === 'STOCK').map(p => p.symbol.toUpperCase()) || []
+  return Array.from(new Set(['BBCA', 'BBRI', ...owned])).join(',')
+})
+
+const { data: cryptoPrices } = useCsrfFetch(() => `/api/crypto?ids=${cryptoQuery.value}`)
+const { data: sahamPrices } = useCsrfFetch(() => `/api/saham?symbols=${stockQuery.value}`)
 
 const totalAssetValue = computed(() => {
   if (!dashboard.value?.portfolios) return 0
+
   let totalCrypto = 0
   let totalStock = 0
-  for (const p of dashboard.value.portfolios) {
-    const currCrypto = cryptoPrices.value?.[p.symbol]?.idr
-    totalCrypto += p.amount * (currCrypto || 0)
 
-    const stockCode = p.symbol.toUpperCase()
-    const stockData = sahamPrices.value?.data?.results?.find(s => s.ticker === stockCode)
-    const currStock = stockData?.close ? parseInt(stockData.close) : 0
-    totalStock += (p.amount * 100) * (currStock || 0)
+  for (const p of dashboard.value.portfolios) {
+    if (p.type === 'CRYPTO') {
+      const symbolId = p.symbol.toLowerCase()
+      const currCrypto = cryptoPrices.value?.[symbolId]?.idr || 0
+      totalCrypto += p.amount * currCrypto
+    }
+    else if (p.type === 'STOCK') {
+      const stockCode = p.symbol.toUpperCase()
+      const stockData = sahamPrices.value?.data?.results?.find(s => (s.symbol || '').toUpperCase() === stockCode)
+      let currStock = 0
+      if (stockData && stockData.close) {
+        currStock = typeof stockData.close === 'number' ? stockData.close : parseInt(stockData.close.toString().replace(/[^0-9]/g, ''))
+      }
+      totalStock += (p.amount * 100) * currStock
+    }
   }
+
   return totalCrypto + totalStock
 })
 

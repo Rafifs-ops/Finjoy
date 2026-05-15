@@ -7,6 +7,8 @@ export const CATEGORIES = [
   { name: 'Gaji', type: 'INCOME', icon: '💸' },
   { name: 'Bonus', type: 'INCOME', icon: '🎉' },
   { name: 'Tabungan', type: 'EXPENSE', icon: '🏦' },
+  { name: 'Saham', type: 'EXPENSE', icon: '📈' },
+  { name: 'Kripto', type: 'EXPENSE', icon: '🪙' },
 ]
 
 export const getCategoryIcon = (name: string) => {
