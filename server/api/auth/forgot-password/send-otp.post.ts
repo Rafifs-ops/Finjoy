@@ -51,13 +51,13 @@ export default defineEventHandler(async (event) => {
 
   try {
     await transporter.sendMail({
-      from: `"Kelola Finance" <${process.env.SMTP_USER}>`,
+      from: `"Finjoy" <${process.env.SMTP_USER}>`,
       to: email,
       subject: 'Kode Verifikasi Lupa Kata Sandi',
       text: `Halo ${user.name || 'Pengguna'},\n\nKode verifikasi Anda untuk mengatur ulang kata sandi adalah: ${otp}\n\nKode ini berlaku selama 5 menit.`,
       html: `
         <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
-          <h2>Reset Kata Sandi Akun Kelola</h2>
+          <h2>Reset Kata Sandi Akun Finjoy</h2>
           <p>Halo <strong>${user.name || 'Pengguna'}</strong>,</p>
           <p>Kami menerima permintaan untuk mengatur ulang kata sandi akun Anda. Berikut adalah kode OTP Anda:</p>
           <h1 style="color: #2F9E44; font-size: 36px; letter-spacing: 5px;">${otp}</h1>

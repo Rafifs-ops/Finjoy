@@ -3,7 +3,7 @@
 
     <div class="mb-6 flex-shrink-0">
       <div class="font-extrabold text-kelola-teal tracking-tighter flex items-center"><img
-          src="/assets/images/logo-finjoy.png" alt="Kelola Logo" class="h-20 w-auto" /> AI.</div>
+          src="/assets/images/logo-finjoy.png" alt="Finjoy Logo" class="h-20 w-auto" /> AI.</div>
       <p class="mt-1 font-semibold text-sm">Teman curhat keuangan cerdasmu.</p>
     </div>
 
@@ -78,7 +78,7 @@ const sendMessage = async () => {
   scrollToBottom()
 
   try {
-    const response = await $csrfFetch('/api/ai/chat', {
+    const stream = await $csrfFetch('/api/ai/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -87,18 +87,11 @@ const sendMessage = async () => {
           role: m.role === 'user' ? 'user' : 'model',
           text: m.text
         }))
-      })
+      }),
+      responseType: 'stream'
     })
 
-    if (!response.ok) {
-      loading.value = false
-      const errData = await response.json().catch(() => ({}))
-      const errMsg = errData.statusMessage || 'Maaf, server lagi ngambek nih. Coba lagi nanti ya! 😢'
-      messages.value.push({ role: 'model', text: errMsg })
-      return
-    }
-
-    const reader = response.body.getReader()
+    const reader = stream.getReader()
     const decoder = new TextDecoder()
     let aiMsg = { role: 'model', text: '' }
     messages.value.push(aiMsg)
@@ -108,19 +101,38 @@ const sendMessage = async () => {
 
     while (true) {
       const { done, value } = await reader.read()
-      if (done) {
-        console.log('[DEBUG] Stream complete')
-        break
-      }
+      if (done) break
       const chunk = decoder.decode(value, { stream: true })
-      console.log('[DEBUG] Received chunk:', chunk.substring(0, 30).replace(/\n/g, ' ') + '...')
       messages.value[messages.value.length - 1].text += chunk
       scrollToBottom()
     }
   } catch (e) {
     loading.value = false
-    if (!messages.value.some(m => m.text.includes('ngambek') || m.text.includes('kuota'))) {
-      messages.value.push({ role: 'model', text: 'Maaf, ada gangguan koneksi. Coba lagi nanti ya! 😢' })
+    let errMsg = 'Maaf, ada gangguan koneksi. Coba lagi nanti ya! 😢'
+
+    if (e.data && e.data.getReader) {
+      try {
+        const reader = e.data.getReader()
+        let result = ''
+        const decoder = new TextDecoder()
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+          result += decoder.decode(value, { stream: true })
+        }
+        const errData = JSON.parse(result)
+        if (errData.statusMessage || errData.message) {
+          errMsg = errData.statusMessage || errData.message
+        }
+      } catch (parseErr) {
+        // Failed to parse error stream
+      }
+    } else if (e.data && (e.data.statusMessage || e.data.message)) {
+      errMsg = e.data.statusMessage || e.data.message
+    }
+
+    if (!messages.value.some(m => m.text.includes(errMsg))) {
+      messages.value.push({ role: 'model', text: errMsg })
     }
   }
 }

@@ -74,7 +74,7 @@ Instruksi tambahan:
     // AI SDK untuk menjalankan AI (memilih model dan system instruction) 
     // Model yang digunakan adalah gemini-2.0-flash
     const model = genAI.getGenerativeModel({
-      model: 'gemini-2.0-flash',
+      model: 'gemini-2.5-flash',
       systemInstruction
     })
 

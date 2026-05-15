@@ -76,15 +76,15 @@ export default defineEventHandler(async (event) => {
 
   try {
     await transporter.sendMail({
-      from: `"Kelola Finance" <${process.env.SMTP_USER}>`,
+      from: `"Finjoy" <${process.env.SMTP_USER}>`,
       to: email,
-      subject: 'Kode Verifikasi Kelola',
+      subject: 'Kode Verifikasi Finjoy',
       text: `Halo ${name},\n\nKode verifikasi Anda adalah: ${otp}\n\nKode ini berlaku selama 5 menit.`,
       html: `
         <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
-          <h2>Verifikasi Email Akun Kelola</h2>
+          <h2>Verifikasi Email Akun Finjoy</h2>
           <p>Halo <strong>${name}</strong>,</p>
-          <p>Terima kasih telah mendaftar di Kelola. Berikut adalah kode OTP Anda:</p>
+          <p>Terima kasih telah mendaftar di Finjoy. Berikut adalah kode OTP Anda:</p>
           <h1 style="color: #2F9E44; font-size: 36px; letter-spacing: 5px;">${otp}</h1>
           <p>Kode di atas akan kedaluwarsa dalam 5 menit. Jangan bagikan kode ini kepada siapapun.</p>
         </div>

@@ -25,19 +25,21 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    const formData = await readMultipartFormData(event) // Mengambil data form data
+    const body = await readBody(event) // Mengambil JSON body
 
-    // Jika tidak ada form data
-    if (!formData || formData.length === 0) {
-      throw createError({ statusCode: 400, statusMessage: 'Tidak ada file statis yang diunggah.' })
-    }
-
-    const file = formData.find((f: any) => f.name === 'image') // Mencari file gambar
-
-    // Jika tidak ada file gambar
-    if (!file) {
+    // Jika tidak ada data gambar
+    if (!body || !body.image) {
       throw createError({ statusCode: 400, statusMessage: 'Gambar struk tidak terdeteksi.' })
     }
+
+    // Ekstrak base64 dan mimeType dari data URL
+    const match = body.image.match(/^data:(image\/\w+);base64,(.+)$/)
+    if (!match) {
+      throw createError({ statusCode: 400, statusMessage: 'Format gambar tidak valid.' })
+    }
+
+    const mimeType = match[1]
+    const base64Data = match[2]
 
     // Jika tidak ada geminiApiKey
     if (!process.env.GEMINI_API_KEY) {
@@ -45,12 +47,12 @@ export default defineEventHandler(async (event) => {
     }
 
     // Daftar kategori statis untuk referensi AI
-    const categoryStr = `Makanan (EXPENSE), Transport (EXPENSE), Belanja (EXPENSE), Hiburan (EXPENSE), Tagihan (EXPENSE), Gaji (INCOME), Bonus (INCOME), Tabungan (EXPENSE)`
+    const categoryStr = `Makanan (EXPENSE), Transport (EXPENSE), Belanja (EXPENSE), Hiburan (EXPENSE), Tagihan (EXPENSE), Gaji (INCOME), Bonus (INCOME), Tabungan (EXPENSE), Saham (EXPENSE), Kripto (EXPENSE)`
 
     // Membuat instance GoogleGenerativeAI dari library gemini SDK
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY as string)
     const model = genAI.getGenerativeModel({
-      model: 'gemini-2.0-flash',
+      model: 'gemini-2.5-flash',
       systemInstruction: `Kamu adalah spesialis ekstraksi data keuangan. Kamu harus mengekstrak data dari gambar nota/struk, dan menempatkannya dalam bentuk JSON yang sempurna. Patuhi aturan ini dengan ketat: Pilih NAMA kategori HANYA dari referensi kategori yang disediakan. Jika tidak sesuai satupun, cari yang paling mendekati. Jika gambar yang dikirim bukan struk/nota, kembalikan error dalam struktur JSON tanpa formatting markdown (no \`\`\`json). Contoh: {"error": "Gambar bukan struk/nota"}`
     })
 
@@ -71,9 +73,8 @@ ${categoryStr}`
       prompt,
       {
         inlineData: {
-          data: file.data.toString('base64'),
-          // Biasanya content type ada di file.type
-          mimeType: file.type || 'image/jpeg'
+          data: base64Data,
+          mimeType: mimeType
         }
       }
     ])
