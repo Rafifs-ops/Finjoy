@@ -59,7 +59,7 @@
 const { csrf } = useCsrf()
 useSeoMeta({ title: 'Riwayat Tabungan - Kelola' })
 
-const { data: history, pending } = useCsrfFetch('/api/savings/history')
+const { data: history, pending } = useFetch('/api/savings/history', { headers: useRequestHeaders(['cookie']) })
 
 const formatNumber = (num) => new Intl.NumberFormat('id-ID').format(num)
 </script>

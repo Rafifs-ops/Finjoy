@@ -64,7 +64,7 @@ const debtId = route.params.id
 const { $csrfFetch } = useNuxtApp()
 
 // Re-using debt listing API to get the specific debt. (Filtering client side for simplicity here)
-const { data: debts, pending, error } = useCsrfFetch('/api/debts', { headers: useRequestHeaders(['cookie']) })
+const { data: debts, pending, error } = useFetch('/api/debts', { headers: useRequestHeaders(['cookie']) })
 
 const debt = computed(() => {
   return debts.value?.find(d => d.id === debtId)

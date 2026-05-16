@@ -119,7 +119,7 @@ const { session } = useCustomAuth()
 const { csrf } = useCsrf()
 const selectedMonth = ref(new Date().toISOString().substring(0, 7)) // 'YYYY-MM'
 
-const { data: transactions, pending } = useCsrfFetch(() => {
+const { data: transactions, pending } = useFetch(() => {
   const [year, month] = selectedMonth.value.split('-')
   return `/api/transactions?month=${month}&year=${year}`
 }, { headers: useRequestHeaders(['cookie']) })

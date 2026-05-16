@@ -194,7 +194,7 @@ const { session } = useCustomAuth()
 useSeoMeta({ title: 'Dashboard - Kelola' })
 
 const hasRequestedInsight = ref(false)
-const { data: insight, pending: insightPending, refresh: refreshInsight } = useCsrfFetch('/api/ai/insights', {
+const { data: insight, pending: insightPending, refresh: refreshInsight } = useFetch('/api/ai/insights', {
   headers: useRequestHeaders(['cookie']),
   immediate: false
 })
@@ -203,7 +203,7 @@ const getAIInsight = () => {
   hasRequestedInsight.value = true
   refreshInsight()
 }
-const { data: dashboard } = useCsrfFetch('/api/dashboard', { headers: useRequestHeaders(['cookie']) })
+const { data: dashboard } = useFetch('/api/dashboard', { headers: useRequestHeaders(['cookie']) })
 
 const hasExpenses = computed(() => {
   return dashboard.value?.recentTransactions?.some(t => t.type === 'EXPENSE') || false
@@ -218,8 +218,8 @@ const stockQuery = computed(() => {
   return Array.from(new Set(['BBCA', 'BBRI', ...owned])).join(',')
 })
 
-const { data: cryptoPrices } = useCsrfFetch(() => `/api/crypto?ids=${cryptoQuery.value}`)
-const { data: sahamPrices } = useCsrfFetch(() => `/api/saham?symbols=${stockQuery.value}`)
+const { data: cryptoPrices } = useFetch(() => `/api/crypto?ids=${cryptoQuery.value}`, { headers: useRequestHeaders(['cookie']) })
+const { data: sahamPrices } = useFetch(() => `/api/saham?symbols=${stockQuery.value}`, { headers: useRequestHeaders(['cookie']) })
 
 const totalAssetValue = computed(() => {
   if (!dashboard.value?.portfolios) return 0

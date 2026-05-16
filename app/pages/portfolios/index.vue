@@ -137,7 +137,7 @@
 <script setup>
 const { $csrfFetch } = useNuxtApp()
 // Mendapatkan Seluruh data Aset user
-const { data: portfolios, pending, refresh: refreshPortfolios } = useCsrfFetch('/api/portfolios', { headers: useRequestHeaders(['cookie']) })
+const { data: portfolios, pending, refresh: refreshPortfolios } = useFetch('/api/portfolios', { headers: useRequestHeaders(['cookie']) })
 
 // Membuat data query url API untuk mengambil harga crypto dan saham
 const cryptoQuery = computed(() => {
@@ -153,8 +153,8 @@ const stockQuery = computed(() => {
 // cth output: "bitcoin,ethereum,binancecoin,ripple,cardano,solana,dogecoin,pepe,shiba-inu"
 
 // Mengambil data harga crypto dan saham
-const { data: cryptoPrices, pending: pendingCrypto } = useCsrfFetch(() => `/api/crypto?ids=${cryptoQuery.value}`)
-const { data: sahamPrices, pending: pendingSaham } = useCsrfFetch(() => `/api/saham?symbols=${stockQuery.value}`)
+const { data: cryptoPrices, pending: pendingCrypto } = useFetch(() => `/api/crypto?ids=${cryptoQuery.value}`, { headers: useRequestHeaders(['cookie']) })
+const { data: sahamPrices, pending: pendingSaham } = useFetch(() => `/api/saham?symbols=${stockQuery.value}`, { headers: useRequestHeaders(['cookie']) })
 
 // Compute dropdown options safely
 const cryptoOptions = computed(() => {
@@ -222,24 +222,38 @@ const addAsset = async () => {
 
     // Ambil harga live dari API untuk menghitung total pembelian
     let livePricePerUnit = 0
+
+    // Jika user memilih menambahkan aset crypto
     if (form.value.type === 'CRYPTO') {
+
+      // Memanggil API crypto
       const res = await $csrfFetch(`/api/crypto?ids=${form.value.symbol}`)
+      // Mengambil harga live crypto sesuai koin yang dipilih
       livePricePerUnit = res?.[form.value.symbol]?.idr || 0
+
+      // Jika user memilih menambahkan aset saham
     } else if (form.value.type === 'STOCK') {
+
+      // Memanggil API saham
       const res = await $csrfFetch(`/api/saham?symbols=${form.value.name}`)
+
+      // Mengambil data saham sesuai simbol yang dipilih
       const stockData = res?.data?.results?.find(s => (s.symbol || '').toUpperCase() === form.value.name)
+
+      // Mengambil harga saham
       if (stockData && stockData.close) {
         livePricePerUnit = typeof stockData.close === 'number' ? stockData.close : parseInt(stockData.close.toString().replace(/[^0-9]/g, ''))
       }
     }
 
-    // Hitung total pengeluaran (Saham: 1 Lot = 100 lembar)
+    // Hitung total harga (Saham: 1 Lot = 100 lembar) lalu simpan di field buy_price
     if (form.value.type === 'STOCK') {
       form.value.buy_price = form.value.quantity * 100 * livePricePerUnit
     } else {
       form.value.buy_price = form.value.quantity * livePricePerUnit
     }
 
+    // Menambahkan data portfolio crypto/saham
     await $csrfFetch('/api/portfolios', { method: 'POST', body: form.value, headers: useRequestHeaders(['cookie']) })
     showAddModal.value = false
     notifyMsg.value = 'Aset berhasil ditambahkan'

@@ -148,7 +148,7 @@ const { session } = useCustomAuth()
 const { $csrfFetch } = useNuxtApp()
 useSeoMeta({ title: 'Anggaran - Kelola' })
 
-const { data: budgets, pending, refresh } = useCsrfFetch('/api/budgets')
+const { data: budgets, pending, refresh } = useFetch('/api/budgets', { headers: useRequestHeaders(['cookie']) })
 
 const showAddModal = ref(false)
 const saving = ref(false)

@@ -1,6 +1,8 @@
 export default defineNuxtRouteMiddleware(async (to, from) => {
     const { session, fetchSession } = useCustomAuth() // Mengambil data auth di client
-    if (!session.value) {
+    const token = useCookie('auth_token') // Cek token dari cookie
+
+    if (!session.value && token.value) {
         await fetchSession() // Mengambil data auth di server
     }
     const publicPages = ['/login', '/register', '/forgot-password'] // Halaman yang tidak memerlukan auth

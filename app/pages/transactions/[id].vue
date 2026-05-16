@@ -67,7 +67,7 @@
 const route = useRoute()
 const transactionId = route.params.id
 
-const { data: transaction, pending, error } = useCsrfFetch(`/api/transactions/${transactionId}`, {
+const { data: transaction, pending, error } = useFetch(`/api/transactions/${transactionId}`, {
   headers: useRequestHeaders(['cookie'])
 })
 

@@ -80,14 +80,30 @@ Instruksi tambahan:
 
     // Jika tidak ada history, maka akan membuat chat baru
     if (!history || history.length === 0) {
+
+      // Memanggil AI untuk membuat chat
       const result = await model.generateContentStream(prompt)
 
+      // Membuat stream untuk mengirim response ke client
+      /* 
+        Secara sederhana, Stream adalah saluran yang mengirimkan data secara terus-menerus, 
+        sedangkan Chunk adalah potongan-potongan kecil dari data yang mengalir di dalam saluran tersebut 
+        (ibarat Stream itu aliran air keran, dan Chunk adalah tetesan-tetesannya). Dalam kodemu\\, 
+        jawaban AI tidak ditunggu sampai selesai seutuhnya baru dikirim ke frontend, 
+        melainkan dipecah menjadi potongan teks kecil (chunk) yang langsung dialirkan (di-stream) 
+        ke layar pengguna. Berkat teknik ini, balasan AI muncul sedikit demi sedikit 
+        seperti sedang "mengetik" secara real-time, sehingga pengguna tidak perlu 
+        menatap layar loading terlalu lama. 
+      */
       const stream = new ReadableStream({
         async start(controller) {
           const encoder = new TextEncoder() // Meng-encode text menjadi byte array
           try {
+            // Loop ini akan menunggu dan menangkap setiap CHUNK yang dihasilkan AI
             for await (const chunk of result.stream) {
+              // Mengambil text dari setiap chunk
               const text = chunk.text()
+              // Jika ada text, maka akan di-encode menjadi byte array dan dikirim ke client
               if (text) {
                 controller.enqueue(encoder.encode(text)) // Meng-encode text menjadi byte array
               }

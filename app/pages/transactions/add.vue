@@ -138,7 +138,7 @@ const isAnalyzing = ref(false)
 const { $csrfFetch } = useNuxtApp()
 useSeoMeta({ title: 'Tambah Transaksi - Kelola' })
 
-const { data: savings } = useCsrfFetch('/api/savings')
+const { data: savings } = useFetch('/api/savings', { headers: useRequestHeaders(['cookie']) })
 
 const form = ref({
   type: 'EXPENSE',

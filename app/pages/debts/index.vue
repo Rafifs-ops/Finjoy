@@ -145,7 +145,7 @@
 useSeoMeta({ title: 'Hutang - Kelola' })
 
 const { $csrfFetch } = useNuxtApp()
-const { data: debts, pending, refresh } = useCsrfFetch('/api/debts')
+const { data: debts, pending, refresh } = useFetch('/api/debts', { headers: useRequestHeaders(['cookie']) })
 
 const showAddModal = ref(false)
 const saving = ref(false)

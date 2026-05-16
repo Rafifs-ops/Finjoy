@@ -21,13 +21,13 @@ export default defineEventHandler(async (event) => {
     // Mengambil data dari body request
     const { type, symbol, name, quantity, buy_price } = await readBody(event)
 
-    const amountParsed = parseFloat(quantity) // Jumlah koin/lot yang dibeli
+    const amountParsed = parseFloat(quantity) // Jumlah koin/lot yang dibeli dikonversi menjadi number
     const totalPembelian = buy_price ? parseFloat(buy_price) : 0 // Total uang yang dikeluarkan
 
     // Simpan harga per koin/lot agar kalkulasi fallback nilai aset di frontend tetap akurat
     const buyPricePerUnit = amountParsed > 0 ? totalPembelian / amountParsed : 0
 
-    // Membuat data portfolio
+    // Menambahkan data portfolio asset crypto/saham
     const portfolio = await prisma.portfolio.create({
       data: {
         id: randomUUID(),
